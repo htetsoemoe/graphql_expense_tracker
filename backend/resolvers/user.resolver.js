@@ -5,7 +5,7 @@ const userResolver = {
         users: () => { // (parent, args, context, info) => { ... }
             return users;
         },
-        getUser: (_, { id }) => {
+        user: (_, { id }) => {
             return users.find(user => user._id === id);
         }
     },
