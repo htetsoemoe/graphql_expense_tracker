@@ -71,3 +71,82 @@ npm install @apollo/client graphql
 -   **@apollo/client:** This single package contains virtually everything you need to set up Apollo Client. It includes the in-memory cache, local state management, error handling, and a React-based view layer.
 
 -   **graphql:** This package provides logic for parsing GraphQL queries.
+
+
+# Types in GraphQL
+
+-   In GraphQL, types are used to define the structure of data that can be queried and manipulated. Types are defined using the type keyword followed by the name of the type and a set of fields.
+
+-   Everything in GraphQL is strongly typed and based on types. Some common types:
+
+	| Type | Description |
+	|----------|----------|
+	| Int   | Represents a signed 32‐bit integer.   |
+	| Float   | Represents a signed double-precision floating-point value.   |
+	| String   | Represents a UTF‐8 character sequence.   |
+	| Boolean   | Represents true or false.   |
+	| ID   | Represents a unique identifier, often used to refetch an object or as the key for a cache. IDs are serialized as strings to prevent clients from accidentally   |
+	| []   | Array of types (e.g, [User])   |
+
+   You can define custom types, like User, Post, etc.
+
+   # Operation Types
+   | Operation | Purpose |
+   |----------|----------|
+   | Query   | Used to fetch data from the server.   |
+   | Mutation   | Used to modify data on the server.   |
+   | Subscription   | Used to establish a long-lived connection to the server and receive real-time updates.   |
+
+	   -   Scalar Types: These are the basic building blocks of GraphQL types. They represent the simplest units of data and include types like Int, Float, String, Boolean, and ID.
+
+	   -   Object Types: These are more complex types that can contain other fields. They are used to define the structure of objects that can be queried.
+
+	   -   Input Types: These are similar to object types but are used for input arguments in mutations.
+
+	   -   Enum Types: These are special types that represent a set of predefined values. They are used to restrict the values that a field can take.
+
+	   -   Union Types: These are used to represent a set of possible types. They are used to express that a field can have one of several types.
+
+	   -   Interface Types: These are used to define a common set of fields that can be implemented by different types.
+
+	   -   List Types: These are used to represent a list of values. They are used to express that a field can have multiple values of the same type.
+
+	   -   Non-Null Types: These are used to indicate that a field cannot be null. They are used to express that a field must have a value.
+
+	   -   Custom Types: These are user-defined types that can be used to represent complex data structures.
+
+	   -   Query Types: These are used to define the root query type in a GraphQL schema. They are used to define the fields that can be queried.
+
+	   -   Mutation Types: These are used to define the root mutation type in a GraphQL schema. They are used to define the fields that can be mutated.
+
+	   -   Subscription Types: These are used to define the root subscription type in a GraphQL schema. They are used to define the fields that can be subscribed to.
+
+	   -   Directive Types: These are used to define directives that can be applied to fields, types, or arguments.
+
+	   -   Schema Types: These are used to define the schema type in a GraphQL schema. They are used to define the types that can be queried or mutated.
+
+	   -   Schema Definition Language (SDL): This is a language used to define the schema of a GraphQL API. It is used to define the types, fields, and relationships between types.
+
+	   -   GraphQL Query Language (GQL): This is a language used to query and manipulate data in a GraphQL API. It is used to define the structure of queries and mutations.
+
+	   -   GraphQL Schema Definition Language (SDL): This is a language used to define the schema of a GraphQL API. It is used to define the types, fields, and relationships between types.
+
+# Benefits of GraphQL
+	- Precise data fetching: GraphQL allows you to specify exactly what data you need, reducing the amount of data transferred over the network.
+
+	- Fewer network requests: GraphQL allows you to fetch multiple resources in a single request, reducing the number of network requests.
+
+	- Strongly typing and validation: GraphQL uses a strongly typed schema, which helps catch errors early and provides a clear contract between the client and the server.
+
+	- Easier evolution of APIs: GraphQL allows for easy evolution of APIs, as new fields can be added to existing types without breaking existing clients.
+
+	- Built-in documentation from schema: GraphQL provides built-in documentation from the schema, making it easier to understand the API.
+
+# Potential Drawbacks of GraphQL
+	- Increased complexity: GraphQL can be more complex than traditional REST APIs, especially for smaller projects.
+
+	- Cache invalidation: GraphQL does not have built-in cache invalidation, which can lead to stale data.
+
+	- Performance: GraphQL can be slower than REST APIs due to the need to fetch multiple resources in a single request. Performance issues with deeply nested queries if not optimized.
+
+	- Learning curve: GraphQL has a steeper learning curve than REST APIs, especially for developers who are not familiar with the concept of a strongly typed schema.

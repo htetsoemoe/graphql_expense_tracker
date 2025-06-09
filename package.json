@@ -15,11 +15,13 @@
     "@graphql-tools/merge": "^9.0.24",
     "bcryptjs": "^3.0.2",
     "connect-mongodb-session": "^5.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "graphql": "^16.11.0",
     "graphql-passport": "^0.6.8",
+    "http": "^0.0.1-security",
     "mongoose": "^8.15.1",
     "passport": "^0.7.0"
   },
