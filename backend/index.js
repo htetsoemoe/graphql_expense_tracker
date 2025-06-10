@@ -4,6 +4,13 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { connectDB } from './db/connectDB.js'
 
+import passport from 'passport'
+import session from 'express-session'
+import ConnectMongoDBSession from 'connect-mongodb-session'
+
+import { buildContext } from 'graphql-passport'
+import { configurePassword } from './password/password.config.js'
+
 import { ApolloServer } from "@apollo/server"
 import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
@@ -13,8 +20,33 @@ import mergedResolvers from "./resolvers/index.js"
 import mergedTypeDefs from "./typeDefs/index.js"
 
 dotenv.config()
+configurePassword()
+
 const app = express()
 const httpServer = http.createServer(app)
+
+const MongoDBStore = ConnectMongoDBSession(session)
+const store = new MongoDBStore({
+    uri: process.env.MONGO_URL,
+    collection: 'sessions',
+})
+store.on('error', err => console.log(err))
+
+// session middleware
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,// this option specifies whether to save the session to the store on every request
+        saveUninitialized: false, // option specifies whether to save uninitialized sessions
+        store: store,
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+            httpOnly: true, // this option specifies whether the cookie should be accessible only through the HTTP protocol
+        }
+    })
+)
+app.use(passport.initialize())
+app.use(passport.session())
 
 const server = new ApolloServer({
     typeDefs: mergedTypeDefs,
@@ -34,7 +66,7 @@ app.use(
     // expressMiddleware accepts the same arguments:
     // an Apollo Server instance and optional configuration options
     expressMiddleware(server, {
-        context: async ({ req }) => ({ req }),
+        context: async ({ req, res }) => buildContext({ req, res }),
     })
 )
 
