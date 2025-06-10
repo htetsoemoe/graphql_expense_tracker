@@ -85,8 +85,9 @@ npm install @apollo/client graphql
 	| Float   | Represents a signed double-precision floating-point value.   |
 	| String   | Represents a UTF‐8 character sequence.   |
 	| Boolean   | Represents true or false.   |
-	| ID   | Represents a unique identifier, often used to refetch an object or as the key for a cache. IDs are serialized as strings to prevent clients from accidentally   |
+	| ID   | Represents a unique identifier, often used to refetch an object or as the key for a cache. IDs are serialized as strings to prevent clients from accidentally sending invalid IDs to the server.   |
 	| []   | Array of types (e.g, [User])   |
+	| {}   | Object of fields (e.g, { name: String })   |
 
    You can define custom types, like User, Post, etc.
 
