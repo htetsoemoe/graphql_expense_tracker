@@ -29,7 +29,7 @@ export const configurePassword = async () => {
                 try {
                     const user = await User.findOne({ username });
                     if (!user) {
-                        throw new Error("Invalid username");
+                        throw new Error("Invalid or wrong username");
                     }
                     const isMatch = await bcrypt.compare(password, user.password);
                     if (!isMatch) {

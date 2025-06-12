@@ -63,16 +63,11 @@ const userResolver = {
                     throw new Error("Missing required fields");
                 }
 
-                const user = await User.findOne({ username });
-                if (!user) {
-                    throw new Error("Invalid username");
-                }
-
-                const isMatch = await bcrypt.compare(password, user.password);
-                if (!isMatch) {
-                    throw new Error("Invalid password");
-                }
-
+                const { user } = await context.authenticate('graphql-local', {
+                    username,
+                    password,
+                });
+                
                 await context.login(user); // adds user to session
                 return user;
             } catch (error) {
