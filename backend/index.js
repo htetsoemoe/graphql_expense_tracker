@@ -46,7 +46,7 @@ app.use(
     })
 )
 app.use(passport.initialize())
-app.use(passport.session())
+app.use(passport.session()) // connect Passport and express-session by adding the passport.session() middleware.
 
 const server = new ApolloServer({
     typeDefs: mergedTypeDefs,
