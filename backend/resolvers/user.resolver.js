@@ -2,28 +2,8 @@ import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 
 const userResolver = {
-    Query: {
-        authUser: async (_, __, context) => { // (parent, args, context, info) => { ... }
-            try {
-                const user = await context.getUser();
-                return user;
-            } catch (error) {
-                console.error(`Error in authUser: ${error}`);
-                throw new Error("Internal server error");
-            }
-        },
-        user: async (_, { userId }) => {
-            try {
-                const user = await User.findById(userId);
-                return user;
-            } catch (error) {
-                console.error(`Error in user query: ${error}`);
-                throw new Error("Internal server error");
-            }
-        }
-    },
     Mutation: {
-        signUp: async (_, { input }, context) => {
+        signUp: async (_, { input }, context) => { // (parent,  args, context, info)
             try {
                 const { username, name, password, gender } = input;
 
@@ -88,7 +68,26 @@ const userResolver = {
                 throw new Error("Internal server error");
             }
         },
-        // TODO: USER/TRANSACTION RELATIONS
+        Query: {
+            authUser: async (_, __, context) => { // (parent, args, context, info) => { ... }
+                try {
+                    const user = await context.getUser();
+                    return user;
+                } catch (error) {
+                    console.error(`Error in authUser: ${error}`);
+                    throw new Error("Internal server error");
+                }
+            },
+            user: async (_, { userId }) => {
+                try {
+                    const user = await User.findById(userId);
+                    return user;
+                } catch (error) {
+                    console.error(`Error in user query: ${error}`);
+                    throw new Error("Internal server error");
+                }
+            }
+        },
     }
 }
 
