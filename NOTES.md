@@ -151,3 +151,70 @@ npm install @apollo/client graphql
 	- Performance: GraphQL can be slower than REST APIs due to the need to fetch multiple resources in a single request. Performance issues with deeply nested queries if not optimized.
 
 	- Learning curve: GraphQL has a steeper learning curve than REST APIs, especially for developers who are not familiar with the concept of a strongly typed schema.
+
+# What is context in GraphQL?
+	The context is an object that is shared across all resolvers during a single GraphQL request. It’s often used to:
+		Share common data like the authenticated user
+		Access services like databases or REST APIs
+		Pass custom headers or tokens
+		Log requests or manage request-scoped data
+
+# Example in Apollo Server
+	const server = new ApolloServer({
+	typeDefs,
+	resolvers,
+	context: ({ req }) => {
+		// Extract the token from headers
+		const token = req.headers.authorization || '';
+
+		// Verify token and get user
+		const user = getUserFromToken(token);
+
+		return { user, db };
+	}
+	});
+
+Then in a resolver:
+
+	const resolvers = {
+		Query: {
+			me: (parent, args, context) => {
+			// Access context.user and context.db
+			return context.user;
+			}
+		}
+	};
+
+
+# Parameters of resolvers in GraphQL
+	- parent: Refers to the return value of the previous resolver in the resolver chain (mainly used in nested resolvers).
+			  For top-level resolvers (like Query or Mutation), it's usually undefined or {}.
+
+	- args: An object that contains the arguments passed by the client in the query or mutation.
+
+	- context: A custom object that's shared across all resolvers during a single request.
+			   You can put in things like:
+					Authenticated user info
+					Database connection
+					Global services/utilities
+
+	- info: Contains information about the execution of the operation:
+					Field name
+					Return type
+					Path
+					AST (Abstract Syntax Tree)
+
+			It's rarely needed unless you're doing advanced tasks like:
+					Logging requested fields
+					Building custom directives
+					Query optimization (e.g., selecting only requested fields)
+
+
+	# Summary of GraphQL Resolver Parameters:
+
+	| Parameter | Description                   | Common Use                             |
+	| --------- | ----------------------------- | -------------------------------------- |
+	| `parent`  | Result from previous resolver | Nested field resolvers                 |
+	| `args`    | Arguments passed to the field | Access query/mutation inputs           |
+	| `context` | Shared data per request       | Auth, DB access, services              |
+	| `info`    | Query execution details       | Advanced logic, logging, introspection |
