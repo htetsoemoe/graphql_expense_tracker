@@ -68,26 +68,26 @@ const userResolver = {
                 throw new Error("Internal server error");
             }
         },
-        Query: {
-            authUser: async (_, __, context) => { // (parent, args, context, info) => { ... }
-                try {
-                    const user = await context.getUser();
-                    return user;
-                } catch (error) {
-                    console.error(`Error in authUser: ${error}`);
-                    throw new Error("Internal server error");
-                }
-            },
-            user: async (_, { userId }) => {
-                try {
-                    const user = await User.findById(userId);
-                    return user;
-                } catch (error) {
-                    console.error(`Error in user query: ${error}`);
-                    throw new Error("Internal server error");
-                }
+    },
+    Query: {
+        authUser: async (_, __, context) => { // (parent, args, context, info) => { ... }
+            try {
+                const user = await context.getUser();
+                return user;
+            } catch (error) {
+                console.error(`Error in authUser: ${error}`);
+                throw new Error("Internal server error");
             }
         },
+        user: async (_, { userId }) => {
+            try {
+                const user = await User.findById(userId);
+                return user;
+            } catch (error) {
+                console.error(`Error in user query: ${error}`);
+                throw new Error("Internal server error");
+            }
+        }
     }
 }
 
