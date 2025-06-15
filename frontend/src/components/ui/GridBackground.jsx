@@ -3,7 +3,7 @@ import { cn } from "../../lib/utils";
 export default function GridBackground({ children }) {
     return (
         <div
-            className="relative flex h-[50rem] w-full items-center justify-center bg-white dark:bg-black">
+            className="relative flex w-full items-center justify-center bg-white dark:bg-black"> {/* remove h-[50rem] */}
             <div
                 className={cn(
                     "absolute inset-0",

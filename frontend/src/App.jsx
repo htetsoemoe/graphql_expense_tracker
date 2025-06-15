@@ -10,7 +10,7 @@ const App = () => {
   const authUser = false
 
   return (
-    <div className='z-50'>
+    <div className='z-50 w-screen'> {/* add w-screen class */}
       {authUser && <Header />}
       <Routes>
         <Route path='/' element={<Home />} />
