@@ -3,8 +3,11 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 import Cards from "../components/Cards";
 import TransactionForm from "../components/TransactionForm";
-
 import { MdLogout } from "react-icons/md";
+import toast from "react-hot-toast";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_AUTHENTICATED_USER } from "../graphql/queries/user.query";
+import { LOGOUT } from "../graphql/mutations/user.mutation";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -25,11 +28,23 @@ const Home = () => {
     ],
   };
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-  };
+  const { data: authUserData } = useQuery(GET_AUTHENTICATED_USER); // for logged in user data
+  const [logout, { loading, client }] = useMutation(LOGOUT, {
+    refetchQueries: ["GetAuthenticatedUser"],
+    awaitRefetchQueries: true,
+  });
 
-  const loading = false;
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Clear the Apollo Client cache FROM THE DOCS (reset the cache entirely, such as when a user logs out)
+      // https://www.apollographql.com/docs/react/caching/advanced-topics#resetting-the-cache
+      client.resetStore();
+    } catch (error) {
+      console.error(`Error in handleLogout: ${error}`);
+      toast.error(error.message);
+    }
+  };
 
   return (
     <>
@@ -39,11 +54,11 @@ const Home = () => {
             Spend wisely, track wisely
           </p>
           <img
-            src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
+            src={authUserData?.authUser.profilePicture}
             className='w-11 h-11 rounded-full border cursor-pointer'
             alt='Avatar'
           />
-          {!loading && <MdLogout className='mx-2 w-5 h-5 cursor-pointer' onClick={handleLogout} />}
+          {!loading && <MdLogout className='mx-2 w-5 h-5 cursor-pointer text-white' onClick={handleLogout} />}
           {/* loading spinner */}
           {loading && <div className='w-6 h-6 border-t-2 border-b-2 mx-2 rounded-full animate-spin'></div>}
         </div>

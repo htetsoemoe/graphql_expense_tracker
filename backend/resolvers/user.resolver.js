@@ -26,7 +26,7 @@ const userResolver = {
                     name,
                     password: hashedPassword,
                     gender,
-                    profilePicture: gender === "boy" ? boyProfilePic : girlProfilePic,
+                    profilePicture: gender === "male" ? boyProfilePic : girlProfilePic,
                 });
                 await newUser.save();
                 await context.login(newUser); // adds user to session

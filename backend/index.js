@@ -61,7 +61,10 @@ await server.start()
 // and our expressMiddleware function.
 app.use(
     "/graphql",
-    cors(),
+    cors({
+        origin: process.env.FRONTEND_URL,
+        credentials: true,
+    }),
     express.json(),
     // expressMiddleware accepts the same arguments:
     // an Apollo Server instance and optional configuration options
