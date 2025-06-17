@@ -16,12 +16,12 @@ const transactionResolver = {
             }
         },
 
-        transaction: (_, { transactionId }, context) => {
+        transaction: async (_, { transactionId }, context) => {
             try {
                 if (!context.getUser()) {
                     throw new Error("User not authenticated");
                 }
-                const transaction = Transaction.findById(transactionId);
+                const transaction = await Transaction.findById(transactionId);
                 return transaction;
             } catch (err) {
                 console.error(`Error in transaction query: ${err}`);

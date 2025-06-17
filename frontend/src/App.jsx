@@ -23,8 +23,7 @@ const App = () => {
           <Route path='/' element={data?.authUser ? <Home /> : <Navigate to='/signin' />} />
           <Route path='/signin' element={data?.authUser ? <Navigate to='/' /> : <SignIn />} />
           <Route path='/signup' element={data?.authUser ? <Navigate to='/' /> : <SignUp />} />
-          <Route path='/transaction/:id'
-            element={data?.authUser ? <Transaction /> : <Navigate to='/signin' />} />
+          <Route path='/transaction/:id' element={data?.authUser ? <Transaction /> : <Navigate to='/signin' />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
         <Toaster />

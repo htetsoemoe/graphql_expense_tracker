@@ -1,20 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TransactionFormSkeleton from "../components/sketetons/TransactionFormSkeleton";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
 
-const TransactionPage = () => {
+const Transaction = () => {
+  const { id } = useParams();
+  const { loading, data } = useQuery(GET_TRANSACTION, {
+    variables: { id: id },
+  })
+
   const [formData, setFormData] = useState({
-    description: "",
-    paymentType: "",
-    category: "",
-    amount: "",
-    location: "",
-    date: "",
+    description: data?.transaction?.description || "",
+    paymentType: data?.transaction?.paymentType || "",
+    category: data?.transaction?.category || "",
+    amount: data?.transaction?.amount || "",
+    location: data?.transaction?.location || "",
+    date: data?.transaction?.date || "",
   });
+
+  // This useEffect is used to set the form data when the transaction data is available.
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        description: data?.transaction?.description,
+        paymentType: data?.transaction?.paymentType,
+        category: data?.transaction?.category,
+        amount: data?.transaction?.amount,
+        location: data?.transaction?.location,
+        date: new Date(+data.transaction.date).toISOString().substr(0, 10),
+      });
+    }
+  }, [data]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("formData", formData);
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -23,7 +48,7 @@ const TransactionPage = () => {
     }));
   };
 
-   // if (loading) return <TransactionFormSkeleton />;
+  if (loading) return <TransactionFormSkeleton />;
 
   return (
     <div className='h-screen max-w-4xl mx-auto flex flex-col items-center'>
@@ -46,7 +71,7 @@ const TransactionPage = () => {
               name='description'
               type='text'
               placeholder='Rent, Groceries, Salary, etc.'
-              value={formData.description}
+              value={formData?.description}
               onChange={handleInputChange}
             />
           </div>
@@ -66,7 +91,7 @@ const TransactionPage = () => {
                 id='paymentType'
                 name='paymentType'
                 onChange={handleInputChange}
-                defaultValue={formData.paymentType}
+                defaultValue={formData?.paymentType}
               >
                 <option value={"card"}>Card</option>
                 <option value={"cash"}>Cash</option>
@@ -97,7 +122,7 @@ const TransactionPage = () => {
                 id='category'
                 name='category'
                 onChange={handleInputChange}
-                defaultValue={formData.category}
+                defaultValue={formData?.category}
               >
                 <option value={"saving"}>Saving</option>
                 <option value={"expense"}>Expense</option>
@@ -126,7 +151,7 @@ const TransactionPage = () => {
               name='amount'
               type='number'
               placeholder='150'
-              value={formData.amount}
+              value={formData?.amount}
               onChange={handleInputChange}
             />
           </div>
@@ -147,7 +172,7 @@ const TransactionPage = () => {
               name='location'
               type='text'
               placeholder='New York'
-              value={formData.location}
+              value={formData?.location}
               onChange={handleInputChange}
             />
           </div>
@@ -167,7 +192,7 @@ const TransactionPage = () => {
               className='appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-[11px] px-4 mb-3 leading-tight focus:outline-none
 						 focus:bg-white'
               placeholder='Select date'
-              value={formData.date}
+              value={formData?.date}
               onChange={handleInputChange}
             />
           </div>
@@ -184,4 +209,4 @@ const TransactionPage = () => {
     </div>
   );
 };
-export default TransactionPage;
+export default Transaction;
