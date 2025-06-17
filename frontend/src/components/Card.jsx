@@ -6,6 +6,9 @@ import { FaTrash } from "react-icons/fa";
 import { HiPencilAlt } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/formatDate";
+import { useMutation } from "@apollo/client";
+import { DELETE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
+import toast from "react-hot-toast";
 
 const categoryColorMap = {
     saving: "from-green-700 to-green-400",
@@ -18,6 +21,11 @@ const Card = ({ transaction, authUser }) => {
     let { description, paymentType, category, amount, location, date } = transaction;
     const cardClass = categoryColorMap[category];
 
+    // Handle delete transaction
+    const [deleteTransaction, { loading }] = useMutation(DELETE_TRANSACTION, {
+        refetchQueries: ["GetTransactions"],
+    });
+
     // Capitalize the first letter of the description
     description = description.charAt(0).toUpperCase() + description.slice(1);
     // Capitalize the first letter of the category
@@ -28,13 +36,30 @@ const Card = ({ transaction, authUser }) => {
     // Format the date
     const formattedDate = formatDate(date);
 
+    // Handle delete transaction
+    const handleDeleteTransaction = async () => {
+        try {
+            await deleteTransaction({
+                variables: {
+                    transactionId: transaction._id,
+                },
+            })
+            toast.success("Transaction deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting transaction:", error);
+            toast.error(error.message);
+        }
+    }
+
     return (
         <div className={`rounded-md p-4 bg-gradient-to-br ${cardClass}`}>
             <div className='flex flex-col gap-3'>
                 <div className='flex flex-row items-center justify-between'>
                     <h2 className='text-lg font-bold text-white'>{category}</h2>
                     <div className='flex items-center gap-2'>
-                        <FaTrash className={"cursor-pointer"} />
+                        {!loading && authUser && (
+                            <FaTrash className={"cursor-pointer"} onClick={handleDeleteTransaction} />
+                        )}
                         <Link to={`/transaction/${transaction._id}`}>
                             <HiPencilAlt className='cursor-pointer' size={20} />
                         </Link>
@@ -61,7 +86,7 @@ const Card = ({ transaction, authUser }) => {
                     <img
                         src={authUser?.profilePicture}
                         className='h-8 w-8 border rounded-full'
-                        alt=''
+                        alt='profile-picture'
                     />
                 </div>
             </div>
