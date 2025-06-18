@@ -29,6 +29,22 @@ const chartData = {
 */
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const defaultData = {
+  labels: ["Default", "Default", "Default"],
+  datasets: [
+    {
+      label: "%",
+      data: [13, 8, 3],
+      backgroundColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235)"],
+      borderColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235, 1)"],
+      borderWidth: 1,
+      borderRadius: 30,
+      spacing: 10,
+      cutout: 130,
+    },
+  ],
+}
+
 const Home = () => {
   const { data: authUserData } = useQuery(GET_AUTHENTICATED_USER); // for logged in user data
   const [logout, { loading, client }] = useMutation(LOGOUT, {
@@ -55,6 +71,12 @@ const Home = () => {
     ],
   });
 
+  // Check if categoryStatisticsData is null or undefined
+  // If categoryStatisticsData is null or undefined, set chartData to defaultData
+  const isDataReady = categoryStatisticsData &&
+    categoryStatisticsData.categoryStatistics &&
+    categoryStatisticsData.categoryStatistics.length > 0;
+
   useEffect(() => {
     if (categoryStatisticsData?.categoryStatistics) {
       const categories = categoryStatisticsData.categoryStatistics.map((stat) => stat.category);
@@ -76,17 +98,19 @@ const Home = () => {
         }
       })
 
-      setChartData((prev) => ({
-        labels: categories, // <== [categories]
-        datasets: [
-          {
-            ...prev.datasets[0],
-            data: totalAmounts, // <== [totalAmounts]
-            backgroundColor: backgroundColors, // <== [backgroundColors]
-            borderColor: borderColors, // <== [borderColors]
-          }
-        ]
-      }))
+    isDataReady ? setChartData((prev) => ({
+      labels: categories,
+      datasets: [
+        {
+          ...prev.datasets[0],
+          data: totalAmounts, // <== [totalAmounts]
+          backgroundColor: backgroundColors, // <== [backgroundColors]
+          borderColor: borderColors, // <== [borderColors]
+        }
+      ]
+    }))
+      :
+      setChartData(defaultData);
     }
   }, [categoryStatisticsData])
 
