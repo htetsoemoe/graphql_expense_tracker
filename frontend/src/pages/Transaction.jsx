@@ -1,15 +1,22 @@
 import { useState, useEffect } from "react";
 import TransactionFormSkeleton from "../components/sketetons/TransactionFormSkeleton";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
+import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
 
 const Transaction = () => {
   const { id } = useParams();
   const { loading, data } = useQuery(GET_TRANSACTION, {
     variables: { id: id },
   })
+
+  const [updateTransaction, { loading: updateLoading }] = useMutation(UPDATE_TRANSACTION, {
+    // refetchQueries: ["GetTransactions"],
+  });
+
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     description: data?.transaction?.description || "",
@@ -37,7 +44,28 @@ const Transaction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("formData", formData);
+
+    const amount = parseFloat(formData.amount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
+
+    try {
+      await updateTransaction({
+        variables: {
+          input: {
+            ...formData,
+            amount,
+            transactionId: id,
+          }
+        }
+      })
+      toast.success("Transaction updated successfully!");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -200,10 +228,11 @@ const Transaction = () => {
         {/* SUBMIT BUTTON */}
         <button
           className='text-white font-bold w-full rounded px-4 py-2 bg-gradient-to-br
-          from-pink-500 to-pink-500 hover:from-pink-600 hover:to-pink-600'
+          from-pink-500 to-pink-500 hover:from-pink-600 hover:to-pink-600 hover:cursor-pointer'
           type='submit'
+          disabled={updateLoading}
         >
-          Update Transaction
+          {updateLoading ? "Updating..." : "Update Transaction"}
         </button>
       </form>
     </div>
