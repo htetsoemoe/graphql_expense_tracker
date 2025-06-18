@@ -1,6 +1,5 @@
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
 import Cards from "../components/Cards";
 import TransactionForm from "../components/TransactionForm";
 import { MdLogout } from "react-icons/md";
@@ -8,31 +7,88 @@ import toast from "react-hot-toast";
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_AUTHENTICATED_USER } from "../graphql/queries/user.query";
 import { LOGOUT } from "../graphql/mutations/user.mutation";
+import { GET_TRANSACTION_STATISTICS } from "../graphql/queries/transaction.query";
+import { useEffect, useState } from "react";
 
+/*
+const chartData = {
+  labels: ["Saving", "Expense", "Investment"],
+  datasets: [
+    {
+      label: "%",
+      data: [13, 8, 3],
+      backgroundColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235)"],
+      borderColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235, 1)"],
+      borderWidth: 1,
+      borderRadius: 30,
+      spacing: 10,
+      cutout: 130,
+    },
+  ],
+};
+*/
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Home = () => {
-  const chartData = {
-    labels: ["Saving", "Expense", "Investment"],
+  const { data: authUserData } = useQuery(GET_AUTHENTICATED_USER); // for logged in user data
+  const [logout, { loading, client }] = useMutation(LOGOUT, {
+    refetchQueries: ["GetAuthenticatedUser"],
+    awaitRefetchQueries: true,
+  });
+
+  const { data: categoryStatisticsData } = useQuery(GET_TRANSACTION_STATISTICS);
+  // console.log(`categoryStatisticsData`, categoryStatisticsData);
+
+  const [chartData, setChartData] = useState({
+    labels: [], // ==> [categories]
     datasets: [
       {
-        label: "%",
-        data: [13, 8, 3],
-        backgroundColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235)"],
-        borderColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235, 1)"],
+        label: "$",
+        data: [], // ==> [totalAmounts]
+        backgroundColor: [], // ==> [backgroundColors]
+        borderColor: [], // ==> [borderColors]
         borderWidth: 1,
         borderRadius: 30,
         spacing: 10,
         cutout: 130,
       },
     ],
-  };
-
-  const { data: authUserData } = useQuery(GET_AUTHENTICATED_USER); // for logged in user data
-  const [logout, { loading, client }] = useMutation(LOGOUT, {
-    refetchQueries: ["GetAuthenticatedUser"],
-    awaitRefetchQueries: true,
   });
+
+  useEffect(() => {
+    if (categoryStatisticsData?.categoryStatistics) {
+      const categories = categoryStatisticsData.categoryStatistics.map((stat) => stat.category);
+      const totalAmounts = categoryStatisticsData.categoryStatistics.map((stat) => stat.totalAmount);
+
+      const backgroundColors = [];
+      const borderColors = [];
+
+      categories.forEach((category) => {
+        if (category === "saving") {
+          backgroundColors.push("rgba(75, 192, 192)");
+          borderColors.push("rgba(75, 192, 192)");
+        } else if (category === "expense") {
+          backgroundColors.push("rgba(255, 99, 132)");
+          borderColors.push("rgba(255, 99, 132)");
+        } else if (category === "investment") {
+          backgroundColors.push("rgba(54, 162, 235)");
+          borderColors.push("rgba(54, 162, 235)");
+        }
+      })
+
+      setChartData((prev) => ({
+        labels: categories, // <== [categories]
+        datasets: [
+          {
+            ...prev.datasets[0],
+            data: totalAmounts, // <== [totalAmounts]
+            backgroundColor: backgroundColors, // <== [backgroundColors]
+            borderColor: borderColors, // <== [borderColors]
+          }
+        ]
+      }))
+    }
+  }, [categoryStatisticsData])
 
   const handleLogout = async () => {
     try {

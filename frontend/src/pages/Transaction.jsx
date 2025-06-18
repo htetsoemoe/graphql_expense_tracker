@@ -3,7 +3,7 @@ import TransactionFormSkeleton from "../components/sketetons/TransactionFormSkel
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
+import { GET_TRANSACTION, GET_TRANSACTION_STATISTICS } from "../graphql/queries/transaction.query";
 import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
 
 const Transaction = () => {
@@ -13,7 +13,8 @@ const Transaction = () => {
   })
 
   const [updateTransaction, { loading: updateLoading }] = useMutation(UPDATE_TRANSACTION, {
-    // refetchQueries: ["GetTransactions"],
+    // https://github.com/apollographql/apollo-client/issues/5419 => refetchQueries is not working, and here is how we fixed it
+    refetchQueries: [{ query: GET_TRANSACTION_STATISTICS }],
   });
 
   const navigate = useNavigate();
