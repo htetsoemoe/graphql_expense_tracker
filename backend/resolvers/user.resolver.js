@@ -1,4 +1,5 @@
 import User from '../models/user.model.js';
+import Transaction from '../models/transaction.model.js';
 import bcrypt from 'bcryptjs';
 
 const userResolver = {
@@ -33,7 +34,7 @@ const userResolver = {
                 return newUser;
             } catch (error) {
                 console.error(`Error in signUp: ${error}`);
-                throw new Error("Internal server error");
+                throw new Error(error.message || `Internal server error`);
             }
         },
         signIn: async (_, { input }, context) => {
@@ -47,12 +48,12 @@ const userResolver = {
                     username,
                     password,
                 });
-                
+
                 await context.login(user); // adds user to session
                 return user;
             } catch (error) {
                 console.error(`Error in signIn: ${error}`);
-                throw new Error("Internal server error");
+                throw new Error(error.message || `Internal server error`);
             }
         },
         logout: async (_, __, context) => {
@@ -65,7 +66,7 @@ const userResolver = {
                 return { message: "Logout successful" };
             } catch (error) {
                 console.error(`Error in logout: ${error}`);
-                throw new Error("Internal server error");
+                throw new Error(error.message || `Internal server error`);
             }
         },
     },
@@ -76,7 +77,7 @@ const userResolver = {
                 return user;
             } catch (error) {
                 console.error(`Error in authUser: ${error}`);
-                throw new Error("Internal server error");
+                throw new Error(error.message || `Internal server error`);
             }
         },
         user: async (_, { userId }) => {
@@ -85,7 +86,18 @@ const userResolver = {
                 return user;
             } catch (error) {
                 console.error(`Error in user query: ${error}`);
-                throw new Error("Internal server error");
+                throw new Error(error.message || `Internal server error`);
+            }
+        }
+    },
+    User: {
+        transactions: async (parent) => {
+            try {
+                const transactions = await Transaction.find({ userId: parent._id })
+                return transactions;
+            } catch (error) {
+                console.error(`Error in User resolver: ${error}`);
+                throw new Error(error.message || `Internal server error`);
             }
         }
     }
