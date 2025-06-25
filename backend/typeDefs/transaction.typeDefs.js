@@ -1,3 +1,5 @@
+// Whenever you update your typeDefs, you must restart your GraphQL server (especially if you're not using hot-reload).
+
 const transactionTypeDefs = `#graphql
     type Transaction {
         _id: ID!,
@@ -8,6 +10,7 @@ const transactionTypeDefs = `#graphql
         amount: Float!,
         location: String,
         date: String!,
+        user: User!
     }
 
     type Query {

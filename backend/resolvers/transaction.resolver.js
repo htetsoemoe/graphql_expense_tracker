@@ -1,6 +1,56 @@
 import Transaction from '../models/transaction.model.js';
+import User from '../models/user.model.js';
 
 const transactionResolver = {
+    
+    Mutation: {
+        createTransaction: async (_, { input }, context) => {
+            try {
+                if (!context.getUser()) {
+                    throw new Error("User not authenticated");
+                }
+                const newTransaction = new Transaction({
+                    ...input,
+                    userId: context.getUser()._id,
+                })
+                await newTransaction.save();
+                return newTransaction;
+            } catch (error) {
+                console.error(`Error in createTransaction: ${error}`);
+                throw new Error("Error creating transaction");
+            }
+        },
+
+        updateTransaction: async (_, { input }, context) => {
+            try {
+                if (!context.getUser()) {
+                    throw new Error("User not authenticated");
+                }
+                const updatedTransaction = await Transaction.findByIdAndUpdate(
+                    input.transactionId,
+                    input,
+                    { new: true }
+                )
+                return updatedTransaction;
+            } catch (err) {
+                console.error(`Error in updateTransaction: ${err}`);
+                throw new Error("Error updating transaction");
+            }
+        },
+
+        deleteTransaction: async (_, { transactionId }, context) => {
+            try {
+                if (!context.getUser()) {
+                    throw new Error("User not authenticated");
+                }
+                const deletedTransaction = await Transaction.findByIdAndDelete(transactionId);
+                return deletedTransaction;
+            } catch (err) {
+                console.error(`Error in deleteTransaction: ${err}`);
+                throw new Error("Error deleting transaction");
+            }
+        }
+    },
     Query: {
         transactions: async (_, __, context) => {
             try {
@@ -21,7 +71,8 @@ const transactionResolver = {
                 if (!context.getUser()) {
                     throw new Error("User not authenticated");
                 }
-                const transaction = await Transaction.findById(transactionId);
+                const transaction = await Transaction.findById(transactionId)
+                    .populate('userId')
                 return transaction;
             } catch (err) {
                 console.error(`Error in transaction query: ${err}`);
@@ -108,53 +159,23 @@ const transactionResolver = {
             Array(0)
 
              */
-        }
+        },
     },
-    Mutation: {
-        createTransaction: async (_, { input }, context) => {
+    Transaction: { // parent is the transaction object
+        user: async (parent) => {
+            // const parentId = parent._id // this is the transaction id (Transaction is parent)
+            const userId = parent.userId;
+
+            // Check if userId is already populated
+            // if (typeof parent.userId === 'object' && parent.userId !== null && parent.userId._id) {
+            //     return parent.userId; // already populated
+            // }
             try {
-                if (!context.getUser()) {
-                    throw new Error("User not authenticated");
-                }
-                const newTransaction = new Transaction({
-                    ...input,
-                    userId: context.getUser()._id,
-                })
-                await newTransaction.save();
-                return newTransaction;
+                const user = await User.findById(userId);
+                return user;
             } catch (error) {
-                console.error(`Error in createTransaction: ${error}`);
-                throw new Error("Error creating transaction");
-            }
-        },
-
-        updateTransaction: async (_, { input }, context) => {
-            try {
-                if (!context.getUser()) {
-                    throw new Error("User not authenticated");
-                }
-                const updatedTransaction = await Transaction.findByIdAndUpdate(
-                    input.transactionId,
-                    input,
-                    { new: true }
-                )
-                return updatedTransaction;
-            } catch (err) {
-                console.error(`Error in updateTransaction: ${err}`);
-                throw new Error("Error updating transaction");
-            }
-        },
-
-        deleteTransaction: async (_, { transactionId }, context) => {
-            try {
-                if (!context.getUser()) {
-                    throw new Error("User not authenticated");
-                }
-                const deletedTransaction = await Transaction.findByIdAndDelete(transactionId);
-                return deletedTransaction;
-            } catch (err) {
-                console.error(`Error in deleteTransaction: ${err}`);
-                throw new Error("Error deleting transaction");
+                console.error(`Error in user resolver: ${error}`);
+                throw new Error(error.message, "Error fetching user");
             }
         }
     }

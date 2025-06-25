@@ -1,3 +1,4 @@
+// Whenever you update your typeDefs, you must restart your GraphQL server (especially if you're not using hot-reload).
 const userTypeDefs = `#graphql
     type User {
         _id: ID!,

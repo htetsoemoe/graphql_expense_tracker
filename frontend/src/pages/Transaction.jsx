@@ -11,6 +11,7 @@ const Transaction = () => {
   const { loading, data } = useQuery(GET_TRANSACTION, {
     variables: { id: id },
   })
+  console.log(`TRANSACTION`, data);
 
   const [updateTransaction, { loading: updateLoading }] = useMutation(UPDATE_TRANSACTION, {
     // https://github.com/apollographql/apollo-client/issues/5419 => refetchQueries is not working, and here is how we fixed it
